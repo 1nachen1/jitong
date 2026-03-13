@@ -1132,6 +1132,11 @@
 
             }
         },
+        observer: true,           // 监听 swiper 内部变化
+        observeParents: true,     // 监听父容器变化
+        onResize: function() {    // 窗口大小改变时重新计算
+            recalcPositions();
+        }
     })
     // 在 Swiper 初始化后，重新计算所有图片的 top 值
     function recalcPositions() {
