@@ -1133,43 +1133,30 @@
             }
         },
     })
-    // Swiper 初始化之后
-    var mySwiper = new Swiper('.swiper-container', {
-        // ... 你的配置
-    });
-
-    // 添加一个延迟重新计算
-    setTimeout(function() {
-        // 重新获取容器宽度
-        var containerWidth = $('.swiper-container').width();
-        var newScaleW = containerWidth / 750;
-        var newScaleH = window.innerHeight / 1334;
-
-        console.log('重新计算：容器宽度', containerWidth, '缩放比例', newScaleW);
+    // 在 Swiper 初始化后，重新计算所有图片的 top 值
+    function recalcPositions() {
+        // 获取当前总高度
+        var totalHeight = $('.swiper-container').height();
+        var scaleH = totalHeight / 1334; // 1334 是原始设计稿高度
 
         var resizes = document.querySelectorAll('.resize');
         for (var j = 0; j < resizes.length; j++) {
             var img = resizes[j];
-
-            // 从缓存中读取原始值
             var cache = img.getAttribute('swiper-animate-style-cache');
             if (cache) {
-                var widthMatch = cache.match(/width:([\d.]+)px/);
-                var leftMatch = cache.match(/left:([\d.]+)px/);
                 var topMatch = cache.match(/top:([\d.]+)px/);
-
-                if (widthMatch) {
-                    img.style.width = Math.round(parseFloat(widthMatch[1]) * newScaleW) + 'px';
-                }
-                if (leftMatch) {
-                    img.style.left = Math.round(parseFloat(leftMatch[1]) * newScaleW) + 'px';
-                }
                 if (topMatch) {
-                    img.style.top = Math.round(parseFloat(topMatch[1]) * newScaleH) + 'px';
+                    // 重新计算 top 值
+                    var newTop = parseFloat(topMatch[1]) * scaleH;
+                    // 确保不超出底部
+                    img.style.top = Math.min(newTop, totalHeight - 100) + 'px';
                 }
             }
         }
-    }, 200);
+    }
+
+    // 页面加载后执行
+    setTimeout(recalcPositions, 300);
 
 </script>
 
