@@ -1133,22 +1133,25 @@
             }
         },
     })
-    // 在 mySwiper 初始化之后添加
+    // Swiper 初始化之后
+    var mySwiper = new Swiper('.swiper-container', {
+        // ... 你的配置
+    });
+
+    // 添加一个延迟重新计算
     setTimeout(function() {
-        // 重新获取容器宽度和窗口高度
-        var newContainerWidth = $('.swiper-container').width();
-        var newWindowHeight = window.innerHeight;
+        // 重新获取容器宽度
+        var containerWidth = $('.swiper-container').width();
+        var newScaleW = containerWidth / 750;
+        var newScaleH = window.innerHeight / 1334;
 
-        // 重新计算缩放比例
-        var newScaleW = newContainerWidth / 750;
-        var newScaleH = newWindowHeight / 1334;
+        console.log('重新计算：容器宽度', containerWidth, '缩放比例', newScaleW);
 
-        // 重新计算所有图片的位置
         var resizes = document.querySelectorAll('.resize');
         for (var j = 0; j < resizes.length; j++) {
             var img = resizes[j];
 
-            // 从缓存属性中读取原始值（如果存在）
+            // 从缓存中读取原始值
             var cache = img.getAttribute('swiper-animate-style-cache');
             if (cache) {
                 var widthMatch = cache.match(/width:([\d.]+)px/);
@@ -1166,7 +1169,7 @@
                 }
             }
         }
-    }, 100); // 延迟100ms执行，确保Swiper初始化完成
+    }, 200);
 
 </script>
 
