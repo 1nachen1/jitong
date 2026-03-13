@@ -1082,66 +1082,24 @@
 <script src="h5/js/swiper.min.js"></script>
 <script src="h5/js/swiper.animate.min.js"></script>
 <script>
-    // 定义一个函数，用于完整地重新计算所有图片的位置和大小
-    function recalcAllPositions() {
-        // 获取当前最新的容器尺寸
-        var container = $('.swiper-container');
-        var containerWidth = container.width();
-        var containerHeight = container.height();
 
-        // 计算最新的缩放比例（基于设计稿 750x1334）
-        var currentScaleW = containerWidth / 750;
-        var currentScaleH = containerHeight / 1334;
-
-        console.log('重新计算：宽度', containerWidth, '高度', containerHeight, 'scaleW', currentScaleW, 'scaleH', currentScaleH);
-
-        var resizes = document.querySelectorAll('.resize');
-        for (var j = 0; j < resizes.length; j++) {
-            var img = resizes[j];
-            // 从缓存属性中读取原始的、未缩放的设计尺寸
-            var cache = img.getAttribute('swiper-animate-style-cache');
-            if (cache) {
-                // 使用正则表达式从缓存字符串中提取原始值
-                var widthMatch = cache.match(/width:([\d.]+)px/);
-                var leftMatch = cache.match(/left:([\d.]+)px/);
-                var topMatch = cache.match(/top:([\d.]+)px/);
-
-                if (widthMatch) {
-                    var originalWidth = parseFloat(widthMatch[1]);
-                    // 重新计算并设置宽度
-                    img.style.width = Math.round(originalWidth * currentScaleW) + 'px';
-                }
-                if (leftMatch) {
-                    var originalLeft = parseFloat(leftMatch[1]);
-                    // 重新计算并设置 left 值
-                    img.style.left = Math.round(originalLeft * currentScaleW) + 'px';
-                }
-                if (topMatch) {
-                    var originalTop = parseFloat(topMatch[1]);
-                    // 重新计算并设置 top 值（使用高度缩放比例）
-                    img.style.top = Math.round(originalTop * currentScaleH) + 'px';
-                }
-            } else {
-                // 如果没有缓存（理论上不应该发生），尝试从当前样式中读取并反向计算（不推荐，作为保底）
-                console.warn('图片缺少缓存属性，可能影响显示', img);
-            }
-        }
+    scaleW = $('.swiper-container').width() / 750;
+    scaleH = window.innerHeight / 1334;
+    var resizes = document.querySelectorAll('.resize');
+    for (var j = 0; j < resizes.length; j++) {
+        resizes[j].style.width = parseInt(resizes[j].style.width) * scaleW + 'px';
+        //resizes[j].style.height = parseInt(resizes[j].style.height) * scaleH + 'px';
+        resizes[j].style.top = parseInt(resizes[j].style.top) * scaleH + 'px';
+        resizes[j].style.left = parseInt(resizes[j].style.left) * scaleW + 'px';
     }
-
-    // --- 页面初始化 ---
-    // 页面加载完成后立即执行一次完整计算
-    $(document).ready(function() {
-        // 稍微延迟一点，确保 Swiper 容器已经渲染完成
-        setTimeout(recalcAllPositions, 100);
-    });
-
-    // --- Swiper 初始化 ---
     var mySwiper = new Swiper('.swiper-container', {
+        //initialSlide: 20,
         direction: 'vertical',
         pagination: '.swiper-pagination',
         paginationClickable: true,
+        //virtualTranslate : true,
         mousewheelControl: true,
-        loop: true, // 保持你原来的设置
+        loop: true,
         onInit: function (swiper) {
             swiperAnimateCache(swiper);
             swiperAnimate(swiper);
@@ -1154,7 +1112,6 @@
         },
         watchSlidesProgress: true,
         onProgress: function (swiper) {
-            // ... 你的 3D 进度效果代码（保持不变）...
             for (var i = 0; i < swiper.slides.length; i++) {
                 var slide = swiper.slides[i];
                 var progress = slide.progress;
@@ -1164,26 +1121,20 @@
                 slide.style.opacity = opacity;
                 es = slide.style;
                 es.webkitTransform = es.MsTransform = es.msTransform = es.MozTransform = es.OTransform = es.transform = 'translate3d(0,' + translate + 'px,-' + translate + 'px) scaleY(' + scale + ')';
+
             }
         },
+
         onSetTransition: function (swiper, speed) {
             for (var i = 0; i < swiper.slides.length; i++) {
                 es = swiper.slides[i].style;
                 es.webkitTransitionDuration = es.MsTransitionDuration = es.msTransitionDuration = es.MozTransitionDuration = es.OTransitionDuration = es.transitionDuration = speed + 'ms';
+
             }
         },
-        // --- 重要：监听变化并重新计算 ---
-        observer: true,           // 监听 swiper 内部变化
-        observeParents: true,     // 监听父容器变化
-        onResize: function() {    // 窗口大小改变时重新计算
-            recalcAllPositions();
-        }
-    });
+    })
+    
 
-    // 监听窗口大小变化（兜底方案）
-    $(window).on('resize', function() {
-        recalcAllPositions();
-    });
 </script>
 
 
